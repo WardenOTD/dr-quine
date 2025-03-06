@@ -34,20 +34,6 @@ grace:
 sully:
 	gcc -Wall -Wextra -Werror Sully.c -o Sully
 	./Sully
-	gcc -Wall -Wextra -Werror Sully_4.c -o Sully_4
-	./Sully_4
-	gcc -Wall -Wextra -Werror Sully_3.c -o Sully_3
-	./Sully_3
-	gcc -Wall -Wextra -Werror Sully_2.c -o Sully_2
-	./Sully_2
-	gcc -Wall -Wextra -Werror Sully_1.c -o Sully_1
-	./Sully_1
-	gcc -Wall -Wextra -Werror Sully_0.c -o Sully_0
-	./Sully_0
-	@ echo ""
-	- gcc -Wall -Wextra -Werror Sully_-1.c -o Sully_-1
-	- ./Sully_-1
-	@ echo ""
 	@echo "\n\033[32mSully\033[0m"
 	diff Sully.c Sully_4.c; [ $$? -eq 1 ]
 	diff Sully_4.c Sully_3.c; [ $$? -eq 1 ]
