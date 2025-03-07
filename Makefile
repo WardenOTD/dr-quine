@@ -1,48 +1,108 @@
-# not final makefile, just for testing
+COLLEENC	= cfile/Colleen.c
+GRACEC		= cfile/Grace.c
+SULLYC		= cfile/Sully.c
 
-cpp:
-	g++ -Wall -Wextra -Werror quine.cpp -o cppquine
-	./cppquine > cpq.cpp
-	g++ -Wall -Wextra -Werror cpq.cpp -o cpq
-	./cpq > cppq.cpp
-	g++ -Wall -Wextra -Werror cppq.cpp -o cppq
+COLLEENS	= asmfile/Colleen.s
+GRACES		= asmfile/Grace.s
+SULLYS		= asmfile/Sully.s
 
-outcpp:
-	echo "\n\033[32mcppquine\033[0m" && ./cppquine && echo "\n\n\033[32mcpq\033[0m" && ./cpq && echo "\n\n\033[32mcppq\033[0m" && ./cppq && echo "\n"
-	diff quine.cpp cpq.cpp
-	diff quine.cpp cppq.cpp
-	diff cpq.cpp cppq.cpp
+SRC			= $(COLLEENC) $(GRACEC) $(SULLYC)
+OBJ			= $(SRC:.c=.o)
 
-c:
-	gcc -Wall -Wextra -Werror Colleen.c -o Colleen
-	./Colleen > tmp.c
-	gcc -Wall -Wextra -Werror tmp.c -o tmp
-	./tmp > tmp2.c
-	gcc -Wall -Wextra -Werror tmp2.c -o tmp2
+ASMSRC		= $(COLLEENS) $(GRACES) $(SULLYS)
+ASMOBJ		= $(ASMSRC:.s=.o)
 
-outc:
-	echo "\n\033[32mColleen\033[0m" && ./Colleen && echo "\n\n\033[32mtmp\033[0m" && ./tmp && echo "\n\n\033[32mtmp2\033[0m" && ./tmp2 && echo "\n"
-	diff Colleen.c tmp.c
-	diff Colleen.c tmp2.c
-	diff tmp.c tmp2.c
+EXENAMES	= $(addprefix testc/,\
+				Colleen, Grace, Sully\
+			), $(addprefix testasm/,\
+				Colleen_asm, Grace_asm, Sully_asm\
+			)
 
-grace:
-	gcc -Wall -Wextra -Werror Grace.c -o Grace
-	echo "\n\033[32mGrace\033[0m" && ./Grace
-	diff Grace.c Grace_kid.c
+GENFILES	= $(addprefix testc/,\
+				tmp.txt\
+				Grace_kid.c\
+				Sully_4 Sully_4.c\
+				Sully_3 Sully_3.c\
+				Sully_2 Sully_2.c\
+				Sully_1 Sully_1.c\
+				Sully_0 Sully_0.c\
+				Sully_-1 Sully_-1.c\
+			)
 
-sully:
-	gcc -Wall -Wextra -Werror Sully.c -o Sully
-	./Sully
-	@echo "\n\033[32mSully\033[0m"
-	diff Sully.c Sully_4.c; [ $$? -eq 1 ]
-	diff Sully_4.c Sully_3.c; [ $$? -eq 1 ]
-	diff Sully_3.c Sully_2.c; [ $$? -eq 1 ]
-	diff Sully_2.c Sully_1.c; [ $$? -eq 1 ]
-	diff Sully_1.c Sully_0.c; [ $$? -eq 1 ]
-	- diff Sully_0.c Sully_-1.c; [ $$? -eq 1 ]
+NAME		= dr-quine
+
+NASM		= nasm -f elf64 -g
+# LINK		= ld -m elf_x86_64
+
+GCC			= gcc -Wall -Wextra -Werror
+
+all: $(NAME)
+
+%.o: %.s
+	$(NASM) $< -o $@
+
+%.o: %.c
+	$(GCC) -c $< -o $@
+
+testasm/Colleen_asm: $(COLLEENS:.s=.o)
+	mkdir -p testasm
+	$(GCC) $< -o $@
+
+testasm/Grace_asm: $(GRACES:.s=.o)
+	mkdir -p testasm
+	$(GCC) $< -o $@
+
+testasm/Sully_asm: $(SULLYS:.s=.o)
+	mkdir -p testasm
+	$(GCC) $< -o $@
+
+compile: testasm/Colleen_asm #testasm/Grace_asm testasm/Sully_asm
+
+testc/Colleen: $(COLLEENC:.c=.o)
+	mkdir -p testc
+	$(GCC) $< -o $@
+
+testc/Grace: $(GRACEC:.c=.o)
+	mkdir -p testc
+	$(GCC) $< -o $@
+
+testc/Sully: $(SULLYC:.c=.o)
+	mkdir -p testc
+	$(GCC) $< -o $@
+
+$(NAME): testc/Colleen testc/Grace testc/Sully compile
 
 clean:
-	rm -f Colleen tmp tmp.c tmp2 tmp2.c cppquine cpq cpq.cpp cppq cppq.cpp
-	rm -f Grace Grace_kid.c
-	rm -f Sully Sully_4 Sully_3 Sully_2 Sully_1 Sully_0 Sully_-1 Sully_4.c Sully_3.c Sully_2.c Sully_1.c Sully_0.c Sully_-1.c
+	rm -rf $(OBJ) $(ASMOBJ) $(GENFILES)
+
+fclean: clean
+	rm -rf $(EXENAMES) testc testasm
+
+re: fclean $(NAME)
+
+.PHONY: clean fclean re testc testasm
+
+testc:
+	@ echo "\n\033[32mColleen\033[0m"
+	@ echo "./Colleen > tmp.txt"
+	@ cd testc && ./Colleen > tmp.txt
+	diff cfile/Colleen.c testc/tmp.txt
+	@ echo "\n\033[32mGrace\033[0m"
+	@ echo "./Grace"
+	@ cd testc && ./Grace
+	diff cfile/Grace.c testc/Grace_kid.c
+	@ echo "\n\033[32mSully\033[0m"
+	@ echo "./Sully"
+	@ cd testc && ./Sully
+	diff cfile/Sully.c testc/Sully_4.c; [ $$? -eq 1 ]
+	diff testc/Sully_4.c testc/Sully_3.c; [ $$? -eq 1 ]
+	diff testc/Sully_3.c testc/Sully_2.c; [ $$? -eq 1 ]
+	diff testc/Sully_2.c testc/Sully_1.c; [ $$? -eq 1 ]
+	diff testc/Sully_1.c testc/Sully_0.c; [ $$? -eq 1 ]
+	- diff testc/Sully_0.c testc/Sully_-1.c; [ $$? -eq 1 ]
+
+testasm:
+	@ echo "\n\033[32mColleen\033[0m"
+	@ echo "./Colleen_asm > tmp.txt"
+	@ cd testasm && ./Colleen_asm > tmp.txt
+	diff asmfile/Colleen.s testasm/tmp.txt
