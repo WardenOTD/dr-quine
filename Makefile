@@ -15,7 +15,7 @@ ASMOBJ		= $(ASMSRC:.s=.o)
 EXENAMES	= $(addprefix testc/,\
 				Colleen, Grace, Sully\
 			), $(addprefix testasm/,\
-				Colleen_asm, Grace_asm, Sully_asm\
+				Colleen, Grace, Sully\
 			)
 
 GENFILES	= $(addprefix testc/,\
@@ -27,6 +27,15 @@ GENFILES	= $(addprefix testc/,\
 				Sully_1 Sully_1.c\
 				Sully_0 Sully_0.c\
 				Sully_-1 Sully_-1.c\
+			), $(addprefix testasm/,\
+				tmp.txt\
+				Grace_kid.s\
+				Sully_4 Sully_4.s\
+				Sully_3 Sully_3.s\
+				Sully_2 Sully_2.s\
+				Sully_1 Sully_1.s\
+				Sully_0 Sully_0.s\
+				Sully_-1 Sully_-1.s\
 			)
 
 NAME		= dr-quine
@@ -44,19 +53,19 @@ all: $(NAME)
 %.o: %.c
 	$(GCC) -c $< -o $@
 
-testasm/Colleen_asm: $(COLLEENS:.s=.o)
+testasm/Colleen: $(COLLEENS:.s=.o)
 	mkdir -p testasm
 	$(GCC) $< -o $@
 
-testasm/Grace_asm: $(GRACES:.s=.o)
+testasm/Grace: $(GRACES:.s=.o)
 	mkdir -p testasm
 	$(GCC) $< -o $@
 
-testasm/Sully_asm: $(SULLYS:.s=.o)
+testasm/Sully: $(SULLYS:.s=.o)
 	mkdir -p testasm
 	$(GCC) $< -o $@
 
-compile: testasm/Colleen_asm #testasm/Grace_asm testasm/Sully_asm
+compile: testasm/Colleen testasm/Grace #testasm/Sully
 
 testc/Colleen: $(COLLEENC:.c=.o)
 	mkdir -p testc
@@ -103,6 +112,10 @@ testc:
 
 testasm:
 	@ echo "\n\033[32mColleen\033[0m"
-	@ echo "./Colleen_asm > tmp.txt"
-	@ cd testasm && ./Colleen_asm > tmp.txt
+	@ echo "./Colleen > tmp.txt"
+	@ cd testasm && ./Colleen > tmp.txt
 	diff asmfile/Colleen.s testasm/tmp.txt
+	@ echo "\n\033[32mGrace\033[0m"
+	@ echo "./Grace"
+	@ cd testasm && ./Grace
+	diff asmfile/Grace.s testasm/Grace_kid.s
