@@ -23,7 +23,7 @@ main:
 	mov rcx, 0x09
 	mov r8, 0x22
 	lea r9, [rel string]
-	mov al, 1
+	mov al, 0
 	call dprintf wrt ..plt
 	mov rax, 3
 	syscall
