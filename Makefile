@@ -65,7 +65,7 @@ testasm/Sully: $(SULLYS:.s=.o)
 	mkdir -p testasm
 	$(GCC) $< -o $@
 
-compile: testasm/Colleen testasm/Grace #testasm/Sully
+compile: testasm/Colleen testasm/Grace testasm/Sully
 
 testc/Colleen: $(COLLEENC:.c=.o)
 	mkdir -p testc
@@ -119,3 +119,12 @@ testasm:
 	@ echo "./Grace"
 	@ cd testasm && ./Grace
 	diff asmfile/Grace.s testasm/Grace_kid.s
+	@ echo "\n\033[32mSully\033[0m"
+	@ echo "./Sully"
+	@ cd testasm && ./Sully
+	diff asmfile/Sully.s testasm/Sully_4.s; [ $$? -eq 1 ]
+	diff testasm/Sully_4.s testasm/Sully_3.s; [ $$? -eq 1 ]
+	diff testasm/Sully_3.s testasm/Sully_2.s; [ $$? -eq 1 ]
+	diff testasm/Sully_2.s testasm/Sully_1.s; [ $$? -eq 1 ]
+	diff testasm/Sully_1.s testasm/Sully_0.s; [ $$? -eq 1 ]
+	- diff testasm/Sully_0.s testasm/Sully_-1.s; [ $$? -eq 1 ]
