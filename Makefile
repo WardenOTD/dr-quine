@@ -10,6 +10,10 @@ COLLEENPY	= bonus/Colleen.py
 GRACEPY		= bonus/Grace.py
 SULLYPY		= bonus/Sully.py
 
+COLLEENCPP	= bonuscpp/Colleen.cpp
+GRACECPP	= bonuscpp/Grace.cpp
+SULLYCPP	= bonuscpp/Sully.cpp
+
 SRC			= $(COLLEENC) $(GRACEC) $(SULLYC)
 OBJ			= $(SRC:.c=.o)
 
@@ -18,9 +22,14 @@ ASMOBJ		= $(ASMSRC:.s=.o)
 
 BONUSSRC	= $(COLLEENPY) $(GRACEPY) $(SULLYPY)
 
+BONUSCPPSRC	= $(COLLEENCPP) $(GRACECPP) $(SULLYCPP)
+BONUSCPPOBJ	= $(BONUSCPPSRC:.cpp=.o)
+
 EXENAMES	= $(addprefix testc/,\
 				Colleen, Grace, Sully\
 			), $(addprefix testasm/,\
+				Colleen, Grace, Sully\
+			), $(addprefix testcpp/,\
 				Colleen, Grace, Sully\
 			)
 
@@ -51,6 +60,15 @@ GENFILES	= $(addprefix testc/,\
 				Sully_1.py\
 				Sully_0.py\
 				Sully_-1.py\
+			), $(addprefix testcpp/,\
+				tmp.txt\
+				Grace_kid.cpp\
+				Sully_4.cpp\
+				Sully_3.cpp\
+				Sully_2.cpp\
+				Sully_1.cpp\
+				Sully_0.cpp\
+				Sully_-1.cpp\
 			)
 
 NAME		= dr-quine
@@ -62,6 +80,8 @@ GCC			= gcc -Wall -Wextra -Werror
 
 PY			= python3
 
+GPP			= g++ -Wall -Wextra -Werror
+
 all: $(NAME)
 
 %.o: %.s
@@ -70,8 +90,25 @@ all: $(NAME)
 %.o: %.c
 	$(GCC) -c $< -o $@
 
-bonus:
+%.o: %.cpp
+	$(GPP) -c $< -o $@
+
+bonus: bonuscpp
 	mkdir -p testbonus
+
+testcpp/Colleen: $(COLLEENCPP:.cpp=.o)
+	mkdir -p testcpp
+	$(GPP) $< -o $@
+
+# testcpp/Grace: $(GRACECPP:.cpp=.o)
+# 	mkdir -p testcpp
+# 	$(GPP) $< -o $@
+
+# testcpp/Sully: $(SULLYCPP:.cpp=.o)
+# 	mkdir -p testcpp
+# 	$(GPP) $< -o $@
+
+bonuscpp: testcpp/Colleen #testcpp/Grace testcpp/Sully
 
 testasm/Colleen: $(COLLEENS:.s=.o)
 	mkdir -p testasm
@@ -102,14 +139,14 @@ testc/Sully: $(SULLYC:.c=.o)
 $(NAME): testc/Colleen testc/Grace testc/Sully compile
 
 clean:
-	rm -rf $(OBJ) $(ASMOBJ) $(GENFILES)
+	rm -rf $(OBJ) $(ASMOBJ) $(BONUSCPPOBJ) $(GENFILES)
 
 fclean: clean
-	rm -rf $(EXENAMES) testc testasm testbonus
+	rm -rf $(EXENAMES) testc testasm testbonus testcpp
 
 re: fclean $(NAME) bonus
 
-.PHONY: clean fclean re testc testasm testbonus bonus
+.PHONY: clean fclean re testc testasm testbonus bonus testcpp
 
 testc:
 	@ echo "\n\033[32mColleen\033[0m"
@@ -167,3 +204,22 @@ testbonus:
 	diff testbonus/Sully_2.py testbonus/Sully_1.py; [ $$? -eq 1 ]
 	diff testbonus/Sully_1.py testbonus/Sully_0.py; [ $$? -eq 1 ]
 	- diff testbonus/Sully_0.py testbonus/Sully_-1.py; [ $$? -eq 1 ]
+
+testcpp:
+	@ echo "\n\033[32mColleen\033[0m"
+	@ echo "./Colleen > tmp.txt"
+	@ cd testcpp && ./Colleen > tmp.txt
+	diff bonuscpp/Colleen.cpp testcpp/tmp.txt
+#	@ echo "\n\033[32mGrace\033[0m"
+#	@ echo "./Grace"
+#	@ cd testcpp && ./Grace
+#	diff bonuscpp/Grace.cpp testcpp/Grace_kid.cpp
+#	@ echo "\n\033[32mSully\033[0m"
+#	@ echo "./Sully"
+#	@ cd testcpp && ./Sully
+#	diff bonuscpp/Sully.cpp testcpp/Sully_4.cpp; [ $$? -eq 1 ]
+#	diff testcpp/Sully_4.cpp testcpp/Sully_3.cpp; [ $$? -eq 1 ]
+#	diff testcpp/Sully_3.cpp testcpp/Sully_2.cpp; [ $$? -eq 1 ]
+#	diff testcpp/Sully_2.cpp testcpp/Sully_1.cpp; [ $$? -eq 1 ]
+#	diff testcpp/Sully_1.cpp testcpp/Sully_0.cpp; [ $$? -eq 1 ]
+#	- diff testcpp/Sully_0.cpp testcpp/Sully_-1.cpp; [ $$? -eq 1 ]
