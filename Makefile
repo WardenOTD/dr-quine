@@ -63,12 +63,12 @@ GENFILES	= $(addprefix testc/,\
 			), $(addprefix testcpp/,\
 				tmp.txt\
 				Grace_kid.cpp\
-				Sully_4.cpp\
-				Sully_3.cpp\
-				Sully_2.cpp\
-				Sully_1.cpp\
-				Sully_0.cpp\
-				Sully_-1.cpp\
+				Sully_4 Sully_4.cpp\
+				Sully_3 Sully_3.cpp\
+				Sully_2 Sully_2.cpp\
+				Sully_1 Sully_1.cpp\
+				Sully_0 Sully_0.cpp\
+				Sully_-1 Sully_-1.cpp\
 			)
 
 NAME		= dr-quine
@@ -100,15 +100,15 @@ testcpp/Colleen: $(COLLEENCPP:.cpp=.o)
 	mkdir -p testcpp
 	$(GPP) $< -o $@
 
-# testcpp/Grace: $(GRACECPP:.cpp=.o)
-# 	mkdir -p testcpp
-# 	$(GPP) $< -o $@
+testcpp/Grace: $(GRACECPP:.cpp=.o)
+	mkdir -p testcpp
+	$(GPP) $< -o $@
 
 # testcpp/Sully: $(SULLYCPP:.cpp=.o)
 # 	mkdir -p testcpp
 # 	$(GPP) $< -o $@
 
-bonuscpp: testcpp/Colleen #testcpp/Grace testcpp/Sully
+bonuscpp: testcpp/Colleen testcpp/Grace #testcpp/Sully
 
 testasm/Colleen: $(COLLEENS:.s=.o)
 	mkdir -p testasm
@@ -210,10 +210,10 @@ testcpp:
 	@ echo "./Colleen > tmp.txt"
 	@ cd testcpp && ./Colleen > tmp.txt
 	diff bonuscpp/Colleen.cpp testcpp/tmp.txt
-#	@ echo "\n\033[32mGrace\033[0m"
-#	@ echo "./Grace"
-#	@ cd testcpp && ./Grace
-#	diff bonuscpp/Grace.cpp testcpp/Grace_kid.cpp
+	@ echo "\n\033[32mGrace\033[0m"
+	@ echo "./Grace"
+	@ cd testcpp && ./Grace
+	diff bonuscpp/Grace.cpp testcpp/Grace_kid.cpp
 #	@ echo "\n\033[32mSully\033[0m"
 #	@ echo "./Sully"
 #	@ cd testcpp && ./Sully
