@@ -104,11 +104,11 @@ testcpp/Grace: $(GRACECPP:.cpp=.o)
 	mkdir -p testcpp
 	$(GPP) $< -o $@
 
-# testcpp/Sully: $(SULLYCPP:.cpp=.o)
-# 	mkdir -p testcpp
-# 	$(GPP) $< -o $@
+testcpp/Sully: $(SULLYCPP:.cpp=.o)
+	mkdir -p testcpp
+	$(GPP) $< -o $@
 
-bonuscpp: testcpp/Colleen testcpp/Grace #testcpp/Sully
+bonuscpp: testcpp/Colleen testcpp/Grace testcpp/Sully
 
 testasm/Colleen: $(COLLEENS:.s=.o)
 	mkdir -p testasm
@@ -139,10 +139,15 @@ testc/Sully: $(SULLYC:.c=.o)
 $(NAME): testc/Colleen testc/Grace testc/Sully compile
 
 clean:
-	rm -rf $(OBJ) $(ASMOBJ) $(BONUSCPPOBJ) $(GENFILES)
+	@ rm -rf $(OBJ) $(ASMOBJ) $(BONUSCPPOBJ) $(GENFILES)
+	@if [ "$(MAKECMDGOALS)" = "clean" ]; then\
+		echo "\033[0;31mrm all except exec files and directory\033[0m";\
+	fi
+	
 
 fclean: clean
-	rm -rf $(EXENAMES) testc testasm testbonus testcpp
+	@ rm -rf $(EXENAMES) testc testasm testbonus testcpp
+	@ echo "\033[0;31mrm all\033[0m"
 
 re: fclean $(NAME) bonus
 
@@ -214,12 +219,12 @@ testcpp:
 	@ echo "./Grace"
 	@ cd testcpp && ./Grace
 	diff bonuscpp/Grace.cpp testcpp/Grace_kid.cpp
-#	@ echo "\n\033[32mSully\033[0m"
-#	@ echo "./Sully"
-#	@ cd testcpp && ./Sully
-#	diff bonuscpp/Sully.cpp testcpp/Sully_4.cpp; [ $$? -eq 1 ]
-#	diff testcpp/Sully_4.cpp testcpp/Sully_3.cpp; [ $$? -eq 1 ]
-#	diff testcpp/Sully_3.cpp testcpp/Sully_2.cpp; [ $$? -eq 1 ]
-#	diff testcpp/Sully_2.cpp testcpp/Sully_1.cpp; [ $$? -eq 1 ]
-#	diff testcpp/Sully_1.cpp testcpp/Sully_0.cpp; [ $$? -eq 1 ]
-#	- diff testcpp/Sully_0.cpp testcpp/Sully_-1.cpp; [ $$? -eq 1 ]
+	@ echo "\n\033[32mSully\033[0m"
+	@ echo "./Sully"
+	@ cd testcpp && ./Sully
+	diff bonuscpp/Sully.cpp testcpp/Sully_4.cpp; [ $$? -eq 1 ]
+	diff testcpp/Sully_4.cpp testcpp/Sully_3.cpp; [ $$? -eq 1 ]
+	diff testcpp/Sully_3.cpp testcpp/Sully_2.cpp; [ $$? -eq 1 ]
+	diff testcpp/Sully_2.cpp testcpp/Sully_1.cpp; [ $$? -eq 1 ]
+	diff testcpp/Sully_1.cpp testcpp/Sully_0.cpp; [ $$? -eq 1 ]
+	- diff testcpp/Sully_0.cpp testcpp/Sully_-1.cpp; [ $$? -eq 1 ]
